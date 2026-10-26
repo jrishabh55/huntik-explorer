@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "publicPages": 2539,
+  "aliases": 1075,
+  "episodes": 52,
+  "characters": 228,
+  "titans": 233,
+  "cards": 448,
+  "relationships": 5495,
+  "imageRecords": 10028,
+  "downloadedImageRecords": 10024,
+  "sourceImageFiles": 10019,
+  "deduplicatedPreviews": 10018,
+  "missingSourceImageReferences": 4,
+  "bytes": 283026099,
+  "files": 12679,
+  "privacyAudit": "passed",
+  "imageSignaturesDimensionsTransparencyAspectRatios": "passed",
+  "checkedAt": "2026-10-26T11:40:11.264Z"
+}

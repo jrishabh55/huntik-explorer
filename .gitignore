@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.cache/
+.superpowers/
+*.log
+.DS_Store
+
+__pycache__/
+*.tsbuildinfo
