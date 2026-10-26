@@ -74,8 +74,34 @@ async function worker() {
 }
 await Promise.all(Array.from({ length: 8 }, worker));
 assert.equal(errors.length, 0, errors.slice(0, 12).join("\n"));
+let proseFields = 0;
+const proseKeys = new Set(["summary", "full_text", "text", "value_text", "plot_text", "description"]);
+// This source category deliberately teaches wiki syntax inside <code><nowiki>.
+const literalExamples = new Map([
+  ["Category:Browse.description", ["[[Category:Categoryname]]"]],
+  ["Category:Help.sections.0.text", ["[[Category:Help]]"]],
+  ["Category:Images.sections.0.text", ["[[Category:]]", "[[Image:Filename.jpg|thumb|Caption]]"]],
+]);
+function auditProse(value, location) {
+  if (!value || typeof value !== "object") return;
+  for (const [key, child] of Object.entries(value)) {
+    if (proseKeys.has(key) && typeof child === "string") {
+      proseFields++;
+      const field = `${location}.${key}`;
+      const audited = (literalExamples.get(field) || []).reduce((text, example) => text.replace(example, ""), child);
+      assert.ok(!/\[\[|\]\]|\{\{|\}\}/.test(audited), `Wiki markup in readable prose: ${field}`);
+    } else if (typeof child === "object") auditProse(child, `${location}.${key}`);
+  }
+}
+auditProse(catalog, "catalog");
+for (const category of await json("categories.json")) auditProse(category, category.title);
+const search = await json("search.json");
+for (const [id, text] of Object.entries(search)) {
+  assert.ok(!/\[\[|\]\]|\{\{|\}\}/.test(text), `Wiki markup in search: ${id}`);
+}
 for (const entry of catalog.entries) {
   const record = await json("detail/" + entry.id.split(":").at(-1) + ".json");
+  auditProse(record, entry.id);
   assert.equal(record.id, entry.id);
   assert.ok(record.raw_wikitext !== undefined);
   assert.ok(
@@ -137,6 +163,7 @@ const report = {
   bytes,
   files,
   privacyAudit: "passed",
+  readableProseAudit: { passed: true, fields: proseFields, searchRecords: Object.keys(search).length, leakedDelimiters: 0, intentionalLiteralExamples: literalExamples.size },
   imageSignaturesDimensionsTransparencyAspectRatios: "passed",
   checkedAt: new Date().toISOString(),
 };

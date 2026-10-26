@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "tsc -b && vite build && node scripts/audit.mjs dist",
+    "build": "tsc -b && vite build && node scripts/audit.mjs dist && python3 scripts/audit_prose.py dist",
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run && python3 -m unittest discover -s tests -p 'test_*.py'",
     "prepare:data": "python3 scripts/prepare.py && node scripts/images.mjs",
-    "audit": "node scripts/audit.mjs public"
+    "audit": "node scripts/audit.mjs public && python3 scripts/audit_prose.py public"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.3.0",

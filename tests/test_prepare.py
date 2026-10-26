@@ -1,6 +1,7 @@
-import importlib.util,json,unittest
+import importlib.util,json,unittest,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'scripts'))
 loader=importlib.util.spec_from_file_location('prepare',ROOT/'scripts/prepare.py')
 m=importlib.util.module_from_spec(loader);loader.loader.exec_module(m)
 class PublicDataTests(unittest.TestCase):

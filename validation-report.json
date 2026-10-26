@@ -12,9 +12,16 @@
   "sourceImageFiles": 10019,
   "deduplicatedPreviews": 10018,
   "missingSourceImageReferences": 4,
-  "bytes": 285048892,
+  "bytes": 282630150,
   "files": 12679,
   "privacyAudit": "passed",
+  "readableProseAudit": {
+    "passed": true,
+    "fields": 43638,
+    "searchRecords": 2539,
+    "leakedDelimiters": 0,
+    "intentionalLiteralExamples": 3
+  },
   "imageSignaturesDimensionsTransparencyAspectRatios": "passed",
-  "checkedAt": "2026-10-26T11:51:40.143Z"
+  "checkedAt": "2026-10-26T12:32:56.370Z"
 }

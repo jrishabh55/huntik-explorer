@@ -38,3 +38,17 @@ Source facts and missing values remain those of the public wiki snapshot. Raw re
 - Release commit: `38e168bae3b503a9a57e5add1b08f2d5ed19b57e`
 - GitHub Actions run40318379932: build, tests, complete payload audit, artifact upload and deployment succeeded. The Pages environment allows the exact app branch.
 - Live browser loaded the home page and all three hero previews, opened episode one, reloaded its repository-subpath deep link successfully and rendered its international titles. Browser error log was empty.
+
+## Wiki prose parser repair — 26 October 2026
+
+The production Lok Lambert page displayed `for the first time]]` under History; Dante Vale and The Spiral Mark reproduced the same failure. Both the archive's lossy text projection and the app's regex stopped an outer File link at an inner link's closing delimiter. React rendered the already-malformed generated JSON.
+
+The app now uses pinned `mwparserfromhell==0.7.2` to render complete syntax nodes from preserved raw source. Captions, nested display links, source citations, lists and content-table parameters remain readable. The source archive is unchanged. Narrow source-typo handling covers a duplicated category closer, two malformed Source citations and a stray international-name brace; original wikitext remains exact.
+
+- Before: 96 article records, 232 readable fields, 384 leaked wiki delimiters; 93 records affected in visible prose.
+- After: 2,539 article records, 43,638 readable fields and 2,539 search entries audited with zero unintended delimiter leaks. Three category-help fields contain explicitly allowed literal syntax examples; raw-source fields are deliberately excluded.
+- Retention audit: all 55,432 checked semantic spans across 4,757 sections survive, including 253 inline image captions, 2,735 gallery captions and 607 content templates. Layout templates and image filenames/options are excluded. All 227 substantially shorter sections are explained by removing gallery filenames/options while retaining captions.
+- All 15 TypeScript tests and 18 Python tests pass. New cases reproduce the original failures, piped caption links, gallery options, table cells, citations, literal nowiki examples, pronunciation apostrophes and the complete data-preparation path. Failing regressions were observed before their fixes.
+- Production build and publication/privacy/image audits pass; site size is 282,630,150 bytes. Image binaries, image metadata and relationship data have no diff. Raw article/section source, factual stats, IDs, categories and image associations match the archive. Recorded SHA-256 checks confirm the source inputs and private supplements are unchanged.
+- Actual local browser checks: Lok, Dante and The Spiral Mark show complete captions without dangling delimiters; History remains a real heading; A Seeker Is Born retains international titles; source/citation controls remain available. The independent code review found no important issues.
+- CI explicitly sets up Python and installs requirements before `npm test`. `npm run build` runs both the readable-field scan and source-span retention audit against `dist/`.

@@ -10,16 +10,19 @@ Search names, aliases and full article text; filter real source fields; save boo
 
 ## Run locally
 
-Node 22.12+ or Node 24, Python 3.9+ for the standard-library data tests.
+Node 22.12+ or Node 24, Python 3.9+ for data preparation and tests.
 
 ```sh
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
 npm ci
 npm test
 npm run build
 npm run preview
 ```
 
-The committed `public/` directory contains the prepared public data and optimized previews. No source archive is needed to build or deploy. `npm run build` audits counts, alias routes, every preview’s image signature/dimensions/transparency/aspect ratio, forbidden private fields and a strict 750MB site budget. The browser loads a compact catalog at startup, article text only when searching, individual profiles on demand, and paginated images.
+The committed `public/` directory contains the prepared public data and optimized previews. No source archive is needed to build or deploy. GitHub Actions installs the pinned Python dependency before running tests. `npm run build` audits readable prose for leaked wiki delimiters, counts, alias routes, every preview’s image signature/dimensions/transparency/aspect ratio, forbidden private fields and a strict 750MB site budget. The browser loads a compact catalog at startup, article text only when searching, individual profiles on demand, and paginated images.
 
 ## Reproduce the public snapshot assets
 
@@ -37,6 +40,7 @@ Pillow handles the single ICO source image; Sharp handles all other formats. `IM
 ## Architecture
 
 - `scripts/prepare.py`: public allowlist, source fidelity, prose cleanup, source-aware links, compact catalogs, lazy detail/gallery chunks.
+- `scripts/wiki_text.py`: syntax-tree rendering with mwparserfromhell; nested links, image captions, citations and content tables are rebuilt from preserved wikitext.
 - `scripts/images.mjs`: cached image conversion and metadata.
 - `scripts/audit.mjs`: full publication verification and `validation-report.json`.
 - `src/domain.ts`: search/filter/sort, comparison, import validation, exports and relationship semantics.
