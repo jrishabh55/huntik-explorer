@@ -10,7 +10,7 @@ Search names, aliases and full article text; filter real source fields; save boo
 
 ## Run locally
 
-Node22.12+ or Node24, Python3.9+ for the standard-library data tests.
+Node 22.12+ or Node 24, Python 3.9+ for the standard-library data tests.
 
 ```sh
 npm ci
@@ -19,7 +19,7 @@ npm run build
 npm run preview
 ```
 
-The committed `public/` directory contains the prepared public data and optimized previews. No source archive is needed to build or deploy. `npm run build` audits counts, alias routes, every preview’s image signature/dimensions/transparency/aspect ratio, forbidden private fields and a strict750MB site budget. The browser loads a compact catalog at startup, article text only when searching, individual profiles on demand, and paginated images.
+The committed `public/` directory contains the prepared public data and optimized previews. No source archive is needed to build or deploy. `npm run build` audits counts, alias routes, every preview’s image signature/dimensions/transparency/aspect ratio, forbidden private fields and a strict 750MB site budget. The browser loads a compact catalog at startup, article text only when searching, individual profiles on demand, and paginated images.
 
 ## Reproduce the public snapshot assets
 
@@ -32,7 +32,7 @@ npm run prepare:data
 npm run audit
 ```
 
-Pillow handles the single ICO source image; Sharp handles all other formats. `IMAGE_PYTHON` can point to an existing Python with Pillow. `IMAGE_MAX` and `IMAGE_QUALITY` default to720 and72. `.cache/` stores conversion results keyed by content hash and settings. All10,019 local source image files are represented by10,018 distinct byte-content previews;10,024 image records retain separate source identities. Four further image references are missing at source. Animated images use static previews and link to their public original.
+Pillow handles the single ICO source image; Sharp handles all other formats. `IMAGE_PYTHON` can point to an existing Python with Pillow. `IMAGE_MAX` and `IMAGE_QUALITY` default to 720 and 72. `.cache/` stores conversion results keyed by content hash and settings. All 10,019 local source image files are represented by 10,018 distinct byte-content previews; 10,024 image records retain separate source identities. Four further image references are missing at source. Animated images use static previews and link to their public original.
 
 ## Architecture
 
@@ -52,6 +52,6 @@ The GitHub Actions workflow builds and audits the committed public assets on pus
 
 ## Attribution
 
-Wiki text: [Huntik Wiki contributors](https://huntik.fandom.com), [CC BY-SA3.0](https://creativecommons.org/licenses/by-sa/3.0/). Individual profiles preserve source revisions, contributors and original wikitext. Presentation and text cleanup are adaptations.
+Wiki text: [Huntik Wiki contributors](https://huntik.fandom.com), [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). Individual profiles preserve source revisions, contributors and original wikitext. Presentation and text cleanup are adaptations.
 
 Images retain their individual rights and source file-page assertions; they do not inherit the wiki text license. Inspect each gallery image’s file page and rights metadata. This is an unofficial fan reference, not an official Huntik product.

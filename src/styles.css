@@ -1389,7 +1389,7 @@ summary {
   background: #74926c;
   margin-right: 7px;
 }
-.graph-panel svg {
+.graph-panel > svg {
   display: block;
   width: 100%;
   height: auto;
@@ -1411,7 +1411,7 @@ summary {
   stroke: #eff2e8;
   stroke-width: 5px;
 }
-.graph-panel svg a:hover circle {
+.graph-panel > svg a:hover circle {
   stroke: #b68f4b;
   stroke-width: 5px;
 }
@@ -1769,11 +1769,13 @@ summary {
 @media (max-width: 760px) {
   .sidebar {
     transform: translateX(-100%);
+    visibility: hidden;
     width: 245px;
     transition: transform 0.2s;
     z-index: 50;
   }
   .sidebar.open {
+    visibility: visible;
     transform: translateX(0);
   }
   .sidebar-scrim {
@@ -1996,7 +1998,7 @@ summary {
   .graph-controls select {
     max-width: 240px;
   }
-  .graph-panel svg {
+  .graph-panel > svg {
     min-height: 350px;
   }
   .node-label {

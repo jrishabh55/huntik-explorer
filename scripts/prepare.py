@@ -26,6 +26,56 @@ def clean_text(value):
  value=re.sub(r'[ \t]+',' ',value)
  return re.sub(r'\n{3,}','\n\n',value).strip()
 
+CONTENT_TEMPLATES={'titanrow','international titles','international names','internationalnamessmall','profile','eplist','eplist2b','eplistcomic'}
+LANGUAGES={'FR':'French','GER':'German','IT':'Italian','POL':'Polish','RUS':'Russian','SPA':'Spanish','POR':'Portuguese','DUT':'Dutch','ENG':'English'}
+def split_template(value):
+ parts=[];current=[];depth=0;i=0
+ while i<len(value):
+  pair=value[i:i+2]
+  if pair=='[[':depth+=1;current.append(pair);i+=2
+  elif pair==']]':depth=max(0,depth-1);current.append(pair);i+=2
+  elif value[i]=='|' and depth==0:parts.append(''.join(current).strip());current=[];i+=1
+  else:current.append(value[i]);i+=1
+ parts.append(''.join(current).strip());return parts
+
+def expand_content_template(match):
+ parts=split_template(match[1]);name=parts[0].lower().strip();args=parts[1:]
+ if name=='country':return args[0] if args else ''
+ if name=='source':return '['+' · '.join(args)+']'
+ if name not in CONTENT_TEMPLATES:return ''
+ if name=='titanrow':return '\n\n'+' — '.join(a for a in args if a.strip())+'\n\n'
+ lines=[]
+ for arg in args:
+  if '=' in arg:
+   key,value=arg.split('=',1);key=key.strip();value=value.strip()
+   if key.lower() in {'image','link','width','align','color','background'} or not value:continue
+   label=' '.join(LANGUAGES.get(part,part) for part in key.split())
+   lines.append(label.capitalize()+': '+value)
+  elif arg:lines.append(arg)
+ return '\n\n'+'\n'.join(lines)+'\n\n'
+
+def readable_section(section):
+ raw=section.get('wikitext','')
+ names={n.strip().lower() for n in re.findall(r'\{\{\s*([^|}\n]+)',raw)}
+ if not names.intersection(CONTENT_TEMPLATES) and '{|' not in raw:return clean_text(section.get('text',''))
+ raw=re.sub(r'<!--.*?-->','',raw,flags=re.S)
+ for _ in range(20):
+  expanded=re.sub(r'\{\{([^{}]*)\}\}',expand_content_template,raw)
+  if expanded==raw:break
+  raw=expanded
+ if '{|' in raw:
+  lines=[]
+  for line in raw.splitlines():
+   line=line.strip()
+   if line.startswith(('{|','|-','|}')):continue
+   if line.startswith(('|','!')):
+    cells=re.split(r'\|\||!!',line[1:])
+    cells=[re.sub(r'^(?:[^|]*(?:style|span|class|align|width)\s*=)[^|]*\|','',c).strip() for c in cells]
+    line=' — '.join(cells)
+   lines.append(line)
+  raw='\n'.join(lines)
+ return clean_text(raw)
+
 def image_path(image):
  return 'media/'+image['sha256'][:24]+'.webp' if image.get('local_path') and image.get('sha256') else None
 
@@ -72,9 +122,9 @@ def main():
   detail=public_record(page)
   attach_links(detail)
   detail['summary']=clean_text(page.get('summary',''))
-  for section in detail.get('sections',[]):section['text']=clean_text(section.get('text',''))
+  for section in detail.get('sections',[]):section['text']=readable_section(section)
   write('detail/'+str(page['page_id'])+'.json',detail)
-  search[page['id']]=clean_text(page.get('full_text','')).lower()
+  search[page['id']]=(clean_text(page.get('full_text',''))+'\n'+'\n'.join(s['text'] for s in detail.get('sections',[]))).lower()
  write('catalog.json',{'entries':entries,'aliases':[{'title':a['title'],'target_id':a['target_id'],'target_title':a['target_title'],'href':destinations.get(a['target_id'],'https://huntik.fandom.com/wiki/'+quote(a['target_title'].replace(' ','_'),safe=''))} for a in aliases],'episodes':[e['id'] for e in episodes],'extras':[e['id'] for e in extras]})
  write('search.json',search)
  write('relationships.json',public_record(read('relationships')))

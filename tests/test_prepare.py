@@ -17,6 +17,15 @@ class PublicDataTests(unittest.TestCase):
   caliban=json.loads((ROOT/'public/data/detail/2107.json').read_text())
   link=next(l for l in caliban['links'] if l['target_title']=='Meso-Titan')
   self.assertEqual(link.get('href'),'#/categories?name=Meso-Titans')
+ def test_content_templates_survive_as_readable_sections(self):
+  lok=json.loads((ROOT/'public/data/detail/1983.json').read_text())
+  bonded=next(s for s in lok['sections'] if s['heading']=='Bonded Titans')['text']
+  self.assertIn('Freelancer',bonded)
+  self.assertGreaterEqual(len([line for line in bonded.splitlines() if line.strip()]),20)
+  episode=json.loads((ROOT/'public/data/detail/2257.json').read_text())
+  titles=next(s for s in episode['sections'] if s['heading']=='International Titles')['text']
+  self.assertIn('Cercatore Per Caso',titles)
+  self.assertIn('Birth of a Seeker',titles)
  def test_real_source_coverage_and_exact_unknown_stats(self):
   catalog=json.loads((ROOT/'public/data/catalog.json').read_text()); entries=catalog['entries']
   self.assertEqual(len(entries),2539)

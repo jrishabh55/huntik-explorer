@@ -105,3 +105,21 @@ describe("reference interactions", () => {
     expect(neighborhood(edges, "1", "flavor text", 12).length).toBe(1);
   });
 });
+
+it("prioritizes family relationships and does not present mission members as faction links", () => {
+  const edges: any[] = [
+    { subject_id: "mission", object_id: "lok", predicate: "members" },
+    { subject_id: "titan", object_id: "lok", predicate: "users" },
+    { subject_id: "lok", object_id: "father", predicate: "father" },
+  ];
+  const kinds = new Map([
+    ["mission", "supporting_page"],
+    ["lok", "character"],
+    ["father", "character"],
+    ["titan", "titan"],
+  ]);
+  expect(
+    neighborhood(edges, "lok", "", 12, kinds).map((e) => e.predicate),
+  ).toEqual(["father", "users"]);
+  expect(neighborhood(edges, "lok", "members", 12, kinds).length).toBe(1);
+});

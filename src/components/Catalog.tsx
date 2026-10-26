@@ -58,7 +58,7 @@ export function Home({
             Explore the archive
             <ArrowRight size={17} />
           </a>
-          <a className="hero-secondary" href="#/browse?kind=episode">
+          <a className="hero-secondary" href={profileHref(catalog.episodes[0])}>
             Start with episode one <ArrowUpRight size={15} />
           </a>
         </div>
@@ -271,6 +271,7 @@ export function Catalog({
             onChange={(e) =>
               setParams(params, {
                 kind: e.target.value,
+                gender: "",
                 page: "",
                 season: "",
                 type: "",
@@ -297,14 +298,22 @@ export function Catalog({
             value={params.get("sort") || ""}
             onChange={(e) => update("sort", e.target.value)}
           >
-            <option value="">{query ? "Relevance" : "Name A–Z"}</option>
+            <option value="">
+              {kind === "episode"
+                ? "Episode order"
+                : query
+                  ? "Relevance"
+                  : "Name A–Z"}
+            </option>
             {kind === "titan" && (
               <>
                 <option value="attack">Attack · high to low</option>
                 <option value="defense">Defense · high to low</option>
               </>
             )}
-            <option value="episode">Episode order</option>
+            {kind !== "episode" && (
+              <option value="episode">Episode order</option>
+            )}
           </select>
         </label>
         {kind === "episode" && (

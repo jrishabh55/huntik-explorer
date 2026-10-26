@@ -20,9 +20,15 @@ export function Graph({
     center = entries.get(id);
   if (!edges) return <Loading error={error} />;
   const all = edges.filter((e) => e.subject_id === id || e.object_id === id),
-    selection = neighborhood(edges, id, predicate, limit).filter(
-      (e) => entries.has(e.object_id) && entries.has(e.subject_id),
-    );
+    selection = neighborhood(
+      edges.filter(
+        (e) => entries.has(e.object_id) && entries.has(e.subject_id),
+      ),
+      id,
+      predicate,
+      limit,
+      new Map(catalog.entries.map((e) => [e.id, e.kind])),
+    ).filter((e) => entries.has(e.object_id) && entries.has(e.subject_id));
   const nodes = [
     ...new Set(selection.flatMap((e) => [e.subject_id, e.object_id])),
   ].filter((n) => n !== id);
@@ -38,9 +44,13 @@ export function Graph({
     ]),
   );
   coords.set(id, { x: 400, y: 280 });
-  const available = predicate
-    ? all.filter((e) => e.predicate === predicate)
-    : all.filter((e) => semanticPredicates.has(e.predicate));
+  const available = neighborhood(
+    edges.filter((e) => entries.has(e.object_id) && entries.has(e.subject_id)),
+    id,
+    predicate,
+    Number.MAX_SAFE_INTEGER,
+    new Map(catalog.entries.map((e) => [e.id, e.kind])),
+  );
   return (
     <>
       <PageHeading

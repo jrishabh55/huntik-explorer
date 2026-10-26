@@ -219,11 +219,34 @@ export const semanticPredicates = new Set([
   "pets",
   "inhabitants",
 ]);
+const familyPredicates = new Set([
+  "father",
+  "mother",
+  "brothers",
+  "sisters",
+  "siblings",
+  "children",
+  "grandchildren",
+  "grandmother",
+  "grandfather",
+  "husband",
+  "wife",
+]);
+const entityKinds = new Set([
+  "character",
+  "titan",
+  "faction",
+  "location",
+  "artifact",
+  "item",
+  "nullifier",
+]);
 export function neighborhood(
   edges: Edge[],
   id: string,
   predicate = "",
   limit = 16,
+  kinds?: Map<string, string>,
 ): Edge[] {
   return edges
     .filter(
@@ -231,8 +254,17 @@ export function neighborhood(
         (e.subject_id === id || e.object_id === id) &&
         (predicate
           ? e.predicate === predicate
-          : semanticPredicates.has(e.predicate)),
+          : semanticPredicates.has(e.predicate) &&
+            (!kinds ||
+              (entityKinds.has(kinds.get(e.subject_id) || "") &&
+                entityKinds.has(kinds.get(e.object_id) || "")))),
     )
+    .sort((a, b) => {
+      const priority = (e: Edge) =>
+        (e.subject_id === id ? 0 : 10) +
+        (familyPredicates.has(e.predicate) ? 0 : 2);
+      return priority(a) - priority(b);
+    })
     .slice(0, limit);
 }
 export function download(

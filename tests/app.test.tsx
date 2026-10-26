@@ -95,3 +95,70 @@ it("keeps the 52 regular episodes separate from both extras", () => {
   );
   expect(screen.getByText("2 records")).toBeTruthy();
 });
+
+it("clears hidden character facets when switching collections", async () => {
+  const catalog = JSON.parse(
+    fs.readFileSync("public/data/catalog.json", "utf8"),
+  );
+  location.hash = "/browse?kind=character&gender=Male";
+  render(
+    <Catalog
+      catalog={catalog}
+      params={new URLSearchParams("kind=character&gender=Male")}
+      saved={[]}
+      compared={[]}
+      onSave={() => {}}
+      onCompare={() => {}}
+    />,
+  );
+  await userEvent.selectOptions(
+    screen.getByRole("combobox", { name: "Collection" }),
+    "titan",
+  );
+  expect(new URLSearchParams(location.hash.split("?")[1]).has("gender")).toBe(
+    false,
+  );
+});
+
+import { Home } from "../src/components/Catalog";
+it("episode-one hero action opens A Seeker Is Born directly", () => {
+  const catalog = JSON.parse(
+    fs.readFileSync("public/data/catalog.json", "utf8"),
+  );
+  render(
+    <Home
+      catalog={catalog}
+      saved={[]}
+      compared={[]}
+      onSave={() => {}}
+      onCompare={() => {}}
+    />,
+  );
+  expect(
+    screen
+      .getByRole("link", { name: "Start with episode one" })
+      .getAttribute("href"),
+  ).toBe("#/entry/" + encodeURIComponent(catalog.episodes[0]));
+});
+it("defaults the episode cards to the verified chronological order", () => {
+  const catalog = JSON.parse(
+    fs.readFileSync("public/data/catalog.json", "utf8"),
+  );
+  render(
+    <Catalog
+      catalog={catalog}
+      params={new URLSearchParams("kind=episode")}
+      saved={[]}
+      compared={[]}
+      onSave={() => {}}
+      onCompare={() => {}}
+    />,
+  );
+  expect(
+    screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent),
+  ).toEqual(
+    catalog.episodes
+      .slice(0, 24)
+      .map((id: string) => catalog.entries.find((e: any) => e.id === id).title),
+  );
+});
